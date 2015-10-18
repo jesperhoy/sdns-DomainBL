@@ -54,7 +54,7 @@ Friend Class DataSet
         Case "I"c
           Dim tmpIP As IPAddress = Nothing
           If IPAddress.TryParse(y, tmpIP) Then
-            If IP4.IPVersion = 4 Then IP4 = DirectCast(tmpIP, IPAddressV4) Else IP6 = DirectCast(tmpIP, IPAddressV6)
+            If tmpIP.IPVersion = 4 Then IP4 = DirectCast(tmpIP, IPAddressV4) Else IP6 = DirectCast(tmpIP, IPAddressV6)
           End If
         Case "T"c
           Integer.TryParse(y, TTL)
