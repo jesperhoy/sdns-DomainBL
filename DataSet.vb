@@ -1,8 +1,8 @@
 ﻿Imports JHSoftware.SimpleDNS.Plugin
 
 Friend Class DataSet
-  Friend IP4 As IPAddressV4 = IPAddressV4.Parse("127.0.0.1")
-  Friend IP6 As IPAddressV6 = IPAddressV6.Parse("::1")
+  Friend IP4 As SdnsIPv4 = SdnsIPv4.Parse("127.0.0.1")
+  Friend IP6 As SdnsIPv6 = SdnsIPv6.Parse("::1")
   Friend TTL As Integer = 300
   Friend XDate As DateTime = Now.AddYears(10)
 
@@ -13,7 +13,7 @@ Friend Class DataSet
     Return (XDate < Now)
   End Function
 
-  Friend Function Contains(ByVal dom As DomainName) As Boolean
+  Friend Function Contains(ByVal dom As DomName) As Boolean
     If MinusSet.Contains(dom) Then Return False
     Return PlusSet.Contains(dom)
   End Function
@@ -25,7 +25,7 @@ Friend Class DataSet
     Dim CurSubSet As SubDataSet
     Dim i As Integer
     Dim x, y As String
-    Dim d As DomainName = Nothing
+    Dim d As DomName = Nothing
     While Not rdr.EndOfStream
       x = rdr.ReadLine()
       If x.Length = 0 Then Continue While
@@ -52,28 +52,28 @@ Friend Class DataSet
           End Try
           If Expired() Then rdr.Close() : Exit Sub
         Case "I"c
-          Dim tmpIP As IPAddress = Nothing
-          If IPAddress.TryParse(y, tmpIP) Then
-            If tmpIP.IPVersion = 4 Then IP4 = DirectCast(tmpIP, IPAddressV4) Else IP6 = DirectCast(tmpIP, IPAddressV6)
+          Dim tmpIP As SdnsIP = Nothing
+          If SdnsIP.TryParse(y, tmpIP) Then
+            If tmpIP.IPVersion = 4 Then IP4 = DirectCast(tmpIP, SdnsIPv4) Else IP6 = DirectCast(tmpIP, SdnsIPv6)
           End If
         Case "T"c
           Integer.TryParse(y, TTL)
         Case "M"c
           If y.StartsWith("*.") Then
-            If Not DomainName.TryParse(y.Substring(2), d) Then Continue While
+            If Not DomName.TryParse(y.Substring(2), d) Then Continue While
             Try
               CurSubSet.EndsWith.Add(d, Nothing)
             Catch
             End Try
           Else
-            If Not DomainName.TryParse(y, d) Then Continue While
+            If Not DomName.TryParse(y, d) Then Continue While
             Try
               CurSubSet.Exact.Add(d, Nothing)
             Catch
             End Try
           End If
         Case "E"c
-          If Not DomainName.TryParse(y, d) Then Continue While
+          If Not DomName.TryParse(y, d) Then Continue While
           Try
             CurSubSet.EndsWith.Add(d, Nothing)
           Catch
@@ -93,11 +93,11 @@ Friend Class DataSet
   End Sub
 
   Private Class SubDataSet
-    Friend Exact As New Dictionary(Of DomainName, Object)
-    Friend EndsWith As New Dictionary(Of DomainName, Object)
+    Friend Exact As New Dictionary(Of DomName, Object)
+    Friend EndsWith As New Dictionary(Of DomName, Object)
     Friend RegEx As New List(Of System.Text.RegularExpressions.Regex)
 
-    Friend Function Contains(ByVal dom As DomainName) As Boolean
+    Friend Function Contains(ByVal dom As DomName) As Boolean
       If Exact.ContainsKey(dom) Then Return True
 
       If EndsWith.Count > 0 Then
