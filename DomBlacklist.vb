@@ -57,15 +57,15 @@ Public Class DomBlacklist
     End If
   End Sub
 
-  Public Function LookupHost(req As IDNSRequest) As Task(Of LookupResult(Of SdnsIP)) Implements ILookupHost.LookupHost
-    Return Task.FromResult(LookupHost2(req))
+  Public Function LookupHost(name As DomName, ipv6 As Boolean, req As IDNSRequest) As Task(Of LookupResult(Of SdnsIP)) Implements ILookupHost.LookupHost
+    Return Task.FromResult(LookupHost2(name, ipv6, req))
   End Function
-  Public Function LookupHost2(req As IDNSRequest) As LookupResult(Of SdnsIP)
-    If MyData.XDate > Now AndAlso MyData.Contains(req.QName) Then
-      If req.QType = DNSRecType.A Then
-        Return New LookupResult(Of SdnsIP) With {.Value = MyData.IP4, .TTL = MyData.TTL}
-      Else
+  Public Function LookupHost2(name As DomName, ipv6 As Boolean, req As IDNSRequest) As LookupResult(Of SdnsIP)
+    If MyData.XDate > Now AndAlso MyData.Contains(name) Then
+      If ipv6 Then
         Return New LookupResult(Of SdnsIP) With {.Value = MyData.IP6, .TTL = MyData.TTL}
+      Else
+        Return New LookupResult(Of SdnsIP) With {.Value = MyData.IP4, .TTL = MyData.TTL}
       End If
     Else
       Return Nothing
