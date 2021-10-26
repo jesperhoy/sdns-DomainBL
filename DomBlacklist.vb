@@ -27,11 +27,11 @@ Public Class DomBlacklist
   End Function
 #End Region
 
-  Public Function GetPlugInTypeInfo() As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.GetPlugInTypeInfo
+  Public Function GetPlugInTypeInfo() As JHSoftware.SimpleDNS.Plugin.IPlugInBase.PlugInTypeInfo Implements JHSoftware.SimpleDNS.Plugin.IPlugInBase.GetTypeInfo
     With GetPlugInTypeInfo
       .Name = "Domain Blacklist"
       .Description = "Serves list of blocked domain names from a file"
-      .InfoURL = "https://simpledns.plus/kb/171/domain-blacklist-plug-in"
+      .InfoURL = "https://simpledns.plus/plugin-domainbl"
     End With
   End Function
 
@@ -57,10 +57,10 @@ Public Class DomBlacklist
     End If
   End Sub
 
-  Public Function LookupHost(name As DomName, ipv6 As Boolean, req As IDNSRequest) As Task(Of LookupResult(Of SdnsIP)) Implements ILookupHost.LookupHost
+  Public Function LookupHost(name As DomName, ipv6 As Boolean, req As IRequestContext) As Task(Of LookupResult(Of SdnsIP)) Implements ILookupHost.LookupHost
     Return Task.FromResult(LookupHost2(name, ipv6, req))
   End Function
-  Public Function LookupHost2(name As DomName, ipv6 As Boolean, req As IDNSRequest) As LookupResult(Of SdnsIP)
+  Public Function LookupHost2(name As DomName, ipv6 As Boolean, req As IRequestContext) As LookupResult(Of SdnsIP)
     If MyData.XDate > Now AndAlso MyData.Contains(name) Then
       If ipv6 Then
         Return New LookupResult(Of SdnsIP) With {.Value = MyData.IP6, .TTL = MyData.TTL}
